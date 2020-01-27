@@ -28,29 +28,28 @@ socket.on('connect', function() {
     //imprime en la consola del navegador los clientes conectaus pero solo 
     //le muestra el mensaje a la maquina que se acaba de conectar no a todos
     console.log('Usuarios conectados', res);
+    renderizarUsuarios(res);
     
    });
 
-   
-
+  
 
  });
-
- //
-//  enviarMensaje emit
-
 
 
  //todos los clientes escuchan o bueno reciben el mensaje de cuantos clientes estan activos
    //mediante la consola del navegador 
    socket.on('listarPersona',function(personas){
     console.log(personas);
+    renderizarUsuarios(personas);
   });
 
 
 //el servidor envia --> todos los clientes reciben el nombre del cliente que se desconectó Y tambien cualquier mensaje que el cliente escriba desde la consola del navegador se va al server y vuelve aca y lo muestra a todos los clientes activos el mensaje porque es un broadcast.emit
  socket.on('crearMensaje', function(mensaje){
    console.log('Servidor: ', mensaje );
+   renderizarMensajes(mensaje,false);
+   scrollBottom();
  });
 
  socket.on('mensajePrivado', function(mensaje){

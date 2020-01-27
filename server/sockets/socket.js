@@ -39,6 +39,11 @@ io.on("connection", client => {
     // retorno la cantidad de clientes conectaus
     //a todos los clientes de la misma sala
     client.broadcast.to(data.sala).emit('listarPersona',usuario.getPersonasPorSala(data.sala));  
+
+    //dispara este emit a todos los clientes cuando un cliente nuevo ingresa al chat de la misma sala
+    let mensaje = crearMensaje('Administrador1',`${data.nombre} se unió`)
+    client.broadcast.to(data.sala).emit('crearMensaje',mensaje);
+
     callback(usuario.getPersonasPorSala(data.sala));
 
     
@@ -55,21 +60,25 @@ io.on("connection", client => {
      
     //envio a todos los clientes conectados que usuario
     //se desconectó mediante una funcion creada en utils
-    client.broadcast.to(deletedPersona.sala).emit('crearMensaje',crearMensaje(deletedPersona.nombre,'salió'));
+    client.broadcast.to(deletedPersona.sala).emit('crearMensaje',crearMensaje('Administrador',`${deletedPersona.nombre} salió`));
 
     //despues de que alguien se desconecte envio a todos los clientes de la misma sala, los clientes que estan activos de la misma sala
     client.broadcast.to(deletedPersona.sala).emit('listarPersona',usuario.getPersonasPorSala(deletedPersona.sala));
 
   });
 
-  client.on('crearMensaje',(data) => {
+  client.on('crearMensaje',(data,callback) => {
     
     let cliente = usuario.getPersona(client.id);
     let mensaje = crearMensaje(cliente.nombre,data.mensaje);
     //el mensaje que se envia desde el navegador lo devuelvo
     // a todos los clientes de la misma sala
+    
     client.broadcast.to(cliente.sala).emit('crearMensaje',mensaje);
+    
 
+
+    callback(mensaje);
 
   });
   
@@ -79,8 +88,6 @@ io.on("connection", client => {
     let mensaje = crearMensaje(cliente.nombre,data.mensaje);
 
     client.broadcast.to(data.id).emit('mensajePrivado',mensaje);
-
-
 
   });
 
